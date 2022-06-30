@@ -1,5 +1,5 @@
 # Ship Generator V3
-# Ver 0.3.0
+# Ver 0.5.0
 import csv, random, os
 from config.definintions import ROOT_DIR
 
@@ -38,9 +38,27 @@ class Spaceship:
             for row in file:
                     module_stats_dict[row[0]] = row[1:]
         
+        
         #determine ship type and refit
-        self.ship_category = random.choice(hull_types)
-        self.ship_hull = ship_type_dict[self.ship_category][random.randrange(len(ship_type_dict[self.ship_category]))]
+        print("Possible categories are:")
+        for i in range(1, len(hull_types)+1):
+            print(str(i) + ": " +hull_types[i-1])
+        choice = input("Enter the number of the category you want, or 0 for a random ship: ")
+        if int(choice) < 1:
+            self.ship_category = random.choice(hull_types)
+            self.ship_hull = ship_type_dict[self.ship_category][random.randrange(len(ship_type_dict[self.ship_category]))]
+        else:
+            self.ship_category = hull_types[int(choice)-1]
+        
+            print("Possible hulls in this category are:")
+            for i in range(1, len(ship_type_dict[self.ship_category])+1):
+                print(str(i) + ": " + ship_type_dict[self.ship_category][i-1])
+            choice = input("Enter the number of the hull you want, or 0 for random: ")
+            if int(choice) < 1:
+                self.ship_hull = ship_type_dict[self.ship_category][random.randrange(len(ship_type_dict[self.ship_category]))]
+            else:
+                self.ship_hull = ship_type_dict[self.ship_category][int(choice)-1]
+
         
         count = 0
         while True:
@@ -61,6 +79,7 @@ class Spaceship:
                 else:
                     latest_module = random.choice(ship_modules_dict[slot])
                     if latest_module not in repeat_dict[slot]:
+                        #probably a way to do this with list comprehension
                         for repeats in range(int(module_stats_dict[latest_module][2])):
                             repeat_dict[slot].append(latest_module)
 
@@ -84,7 +103,7 @@ class Spaceship:
                 count.append(self.modules.count(i))
         self.modules = []
         for i in range(len(unique_modules)):
-            self.modules.append((unique_modules[i], count[i]))
+            self.modules.append([unique_modules[i], count[i]])
                 
             
     def __str__(self):
