@@ -1,6 +1,6 @@
 # ship_generator
 
-This is the third attempt at my creation of a random spaceship generator. To use the prebuilt .csv files, unzip the zip file in whatever directory that you are keeping the generator in. Documentation is as follows:
+This is the third attempt at my creation of a random spaceship generator. To use the prebuilt .csv files, download the whole thing as a zip file, then unzip the zip file in whatever directory that you are keeping the generator in. The version of Python I have used is 3.8, yet I am not aware of anything that would conflict with later versions. Documentation is as follows:
 
 Ships are composed of hulls and modules. Each module belongs to a slot, and each hull has a number of slots defining what modules can generate there. 
 
