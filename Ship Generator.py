@@ -91,7 +91,7 @@ class Spaceship:
 
             count += 1
                 
-            if (self.fitting_space_remaining >= 0 and self.power_remaining >= 0) or count > 250:
+            if (self.fitting_space_remaining >= 0 and self.power_remaining >= 0) and self.fitting_space_remaining < 0.1*int(ship_slots_dict[self.ship_hull][0]) or count > 250:
                 break
         
         #clean up the list of modules to store type and number

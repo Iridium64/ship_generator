@@ -1,0 +1,10 @@
+Swallow: Skylab, Cargo, System Shuttle, Pirate, Yardworker
+Skink: Mobile Observatory, Hauler, Liner, Privateer
+Anvil I: Shipping Line, Tanker, Blockade Runner, Wildcatter, Heavy Tug
+Anvil II: Shipping Line, Tanker
+Hammer: Trailblazer, Express Delivery, Donkey
+Flint: Barge Carrier, Asteroid Cutter
+Dove: Assault, Patrol
+Hawk: Navy
+Monarch: Liner, Transport
+Beetle: Pirate Defense
