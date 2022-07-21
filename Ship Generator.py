@@ -1,5 +1,5 @@
 # Ship Generator V3
-# Ver 0.5.1
+# Ver 0.5.2
 import csv, random, os
 from config.definintions import ROOT_DIR
 
@@ -41,23 +41,32 @@ class Spaceship:
         
         #determine ship type and refit
         print("Possible categories are:")
-        for i in range(1, len(hull_types)+1):
-            print(str(i) + ": " +hull_types[i-1])
-        choice = input("Enter the number of the category you want, or 0 for a random ship: ")
-        if int(choice) < 1:
-            self.ship_category = random.choice(hull_types)
-            self.ship_hull = ship_type_dict[self.ship_category][random.randrange(len(ship_type_dict[self.ship_category]))]
-        else:
-            self.ship_category = hull_types[int(choice)-1]
-        
-            print("Possible hulls in this category are:")
-            for i in range(1, len(ship_type_dict[self.ship_category])+1):
-                print(str(i) + ": " + ship_type_dict[self.ship_category][i-1])
-            choice = input("Enter the number of the hull you want, or 0 for random: ")
-            if int(choice) < 1:
-                self.ship_hull = ship_type_dict[self.ship_category][random.randrange(len(ship_type_dict[self.ship_category]))]
-            else:
-                self.ship_hull = ship_type_dict[self.ship_category][int(choice)-1]
+        while True:
+            try:
+                for i in range(1, len(hull_types)+1):
+                    print(str(i) + ": " +hull_types[i-1])
+                
+                choice = input("Enter the number of the category you want, or 0 for a random ship: ")
+                if int(choice) == 0:
+                    self.ship_category = random.choice(hull_types)
+                    self.ship_hull = ship_type_dict[self.ship_category][random.randrange(len(ship_type_dict[self.ship_category]))]
+                    break
+                else:
+                    self.ship_category = hull_types[int(choice)-1]
+                    print("Possible hulls in this category are:")
+                    for i in range(1, len(ship_type_dict[self.ship_category])+1):
+                        print(str(i) + ": " + ship_type_dict[self.ship_category][i-1])
+                    choice = input("Enter the number of the hull you want, 0 for a random hull, or -1 to go back: ")
+                    if int(choice) > 0:
+                        self.ship_hull = ship_type_dict[self.ship_category][int(choice)-1]
+                        break
+                    elif int(choice) == 0:
+                        self.ship_hull = ship_type_dict[self.ship_category][random.randrange(len(ship_type_dict[self.ship_category]))]
+                        break
+                    else:
+                        continue
+            except:
+                print("That is not a valid integer! Try again.")
 
         
         count = 0
