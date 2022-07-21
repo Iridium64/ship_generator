@@ -63,12 +63,14 @@ class Spaceship:
         count = 0
         while True:
             #find the slots for the hull
-            self.fitting_space_remaining = int(ship_slots_dict[self.ship_hull][0])
+            self.fitting_space_cap = int(ship_slots_dict[self.ship_hull][0])
+            self.fitting_space_remaining = self.fitting_space_cap
             slots_remaining = ship_slots_dict[self.ship_hull][1:]
 
             #randomly pick modules for the hull
             self.modules = []
             self.power_remaining = 0
+            self.power_cap = 0
             repeat_dict = {x: [] for x in slots_remaining}
 
             while slots_remaining:
@@ -88,10 +90,12 @@ class Spaceship:
                 #read the module's stats
                 self.fitting_space_remaining -= int(module_stats_dict[latest_module][0])
                 self.power_remaining += int(module_stats_dict[latest_module][1])
+                if int(module_stats_dict[latest_module][1]) > 0:
+                    self.power_cap += int(module_stats_dict[latest_module][1])
 
             count += 1
                 
-            if (self.fitting_space_remaining >= 0 and self.power_remaining >= 0) and self.fitting_space_remaining < 0.1*int(ship_slots_dict[self.ship_hull][0]) or count > 250:
+            if (self.fitting_space_remaining >= 0 and self.power_remaining >= 0) and (self.fitting_space_remaining < 0.1*self.fitting_space_cap or self.power_remaining < 0.1*self.power_cap) or count > 250:
                 break
         
         #clean up the list of modules to store type and number
@@ -108,8 +112,8 @@ class Spaceship:
             
     def __str__(self):
         output = self.ship_hull + " (" + self.ship_category + ")\n"
-        output += "Power Remaining: " + str(self.power_remaining) + "\n"
-        output += "Fitting Space Remaining: " + str(self.fitting_space_remaining) + "\n"
+        output += "Power Remaining: " + str(self.power_remaining) + " (" + str(self.power_cap) + ")\n"
+        output += "Fitting Space Remaining: " + str(self.fitting_space_remaining) + " (" + str(self.fitting_space_cap) + ")\n"
         output += "List of Modules:\n"
 
         for i in self.modules:

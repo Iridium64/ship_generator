@@ -8,3 +8,5 @@ Dove: Assault, Patrol
 Hawk: Navy
 Monarch: Liner, Transport
 Beetle: Pirate Defense
+Monkey: Tramp Freight, Pirate
+Bear: Tramp Freight, Privateer
