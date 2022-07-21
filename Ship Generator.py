@@ -1,5 +1,5 @@
 # Ship Generator V3
-# Ver 0.5.0
+# Ver 0.5.1
 import csv, random, os
 from config.definintions import ROOT_DIR
 
@@ -109,7 +109,7 @@ class Spaceship:
     def __str__(self):
         output = self.ship_hull + " (" + self.ship_category + ")\n"
         output += "Power Remaining: " + str(self.power_remaining) + "\n"
-        output += "Fitting Space Remaining: "+ str(self.fitting_space_remaining) + "\n"
+        output += "Fitting Space Remaining: " + str(self.fitting_space_remaining) + "\n"
         output += "List of Modules:\n"
 
         for i in self.modules:
