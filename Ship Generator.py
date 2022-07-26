@@ -1,5 +1,5 @@
 # Ship Generator V3
-# Ver 0.5.3
+# Ver 0.5.4
 import csv, random, os
 from config.definintions import ROOT_DIR
 
@@ -67,7 +67,8 @@ class Spaceship:
                         continue
             except ValueError:
                 print("That is not a valid integer! Try again.")
-
+            except IndexError: 
+                print("That is out of range! Try again.")
         
         count = 0
         while True:
