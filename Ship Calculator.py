@@ -2,6 +2,7 @@
 # Ver 0.1.0
 
 import csv, os
+from sys import modules
 from config.definintions import ROOT_DIR
 
 #load from CSV. slightly modfied from the way that the generator handles it internally for readibility reasons
@@ -24,7 +25,7 @@ def load_from_csv():
         for row in file:   
             ship_slots_dict[row[0]] = [row[1]]
             for i in range(1, int(len(row)/2)):
-                ship_slots_dict[row[0]].append((row[i*2], row[i*2+1]))
+                ship_slots_dict[row[0]].append((row[i*2], int(row[i*2+1])))
 
     global slot_types_list
     slot_types_list = []
@@ -57,23 +58,156 @@ def load_from_csv():
                 slot_types_dict[slot_sizes_list[i]].append(slot_types_list[x])
 
 def existing_refit():
-    print("Chosen refit: " + ship_hull)
-    print("This refit has: ")
+    for i in range(len(ship_slots_dict[ship_hull][1:])):
+        slots_remaining = dict(ship_slots_dict[ship_hull][1:])
+
     global fitting_space
-    fitting_space = ship_slots_dict[ship_hull][0]
-    print(str(fitting_space) + " fitting space")
-    for i in range(1, len(ship_slots_dict[ship_hull])):
-        print(str(ship_slots_dict[ship_hull][i][1]) + "x " + ship_slots_dict[ship_hull][i][0])
+    fitting_space = int(ship_slots_dict[ship_hull][0])
+    global power
+    global modules
+    fitting_space_cap = fitting_space
+    power_cap = 0
+    modules = []
+    while True:
+        try:
+            print("Chosen refit: " + ship_hull)
+            print("This refit has: ")
+
+            print(str(fitting_space) + " fitting space remaining")
+            print(str(power) + " power remaining")
+            for i in slots_remaining.keys():
+                if slots_remaining[i] > 0:
+                    print(str(slots_remaining[i]) + "x " + str(i))
+
+            print()
+            print("1: Choose a new module")
+            print("2: Print the ship")
+            print("3: Quit")
+            choice = int(input("Selection: "))
+            if choice == 1:
+                print("Possible slots:")
+                slot_key = []
+                i = 0
+                for key in slots_remaining.keys():
+                    if slots_remaining[key] > 0:
+                        print(str(i+1) + ": " + str(key))
+                    i += 1
+                    slot_key.append(key)
+
+                choice_slot = int(input("Selection: "))
+                print("Possible modules:")
+                slot = slot_key[choice_slot-1]
+                for i in range(1, len(ship_modules_dict[slot])+1):
+                    print(str(i) + ": " + str(ship_modules_dict[slot][i-1]))
+                choice = int(input("Selection: "))
+                module = ship_modules_dict[slot][choice-1]
+                power += int(module_stats_dict[module][1])
+                fitting_space -= int(module_stats_dict[module][0])
+                
+                if int(module_stats_dict[module][1]) > 0:
+                    power_cap += int(module_stats_dict[module][1])
+                slots_remaining[slot] -= 1
+                continue
+
+            if choice == 2:
+                unique_modules = []
+                count = []
+                for i in modules:
+                    if i not in unique_modules:
+                        unique_modules.append(i)
+                        count.append(modules.count(i))
+                modules = []
+                for i in range(len(unique_modules)):
+                    modules.append([unique_modules[i], count[i]])
+                output = ""
+                output += "Power Remaining: " + str(power) + " (" + str(power_cap) + ")\n"
+                output += "Fitting Space Remaining: " + str(fitting_space) + " (" + str(fitting_space_cap) + ")\n"
+                output += "List of Modules:\n"
+                for i in modules:
+                    if i[1] > 1:
+                        output += i[0] + " x" + str(i[1]) + "\n"
+                    else:
+                        output += i[0] + "\n"
+                print(output)
+                continue
+            if choice == 3:
+                break
+
+        except ValueError: 
+            print("That is not a valid integer! Try again.")
+        except IndexError: 
+            print("That is out of range! Try again.")
 
 def new_refit():
-    print("Fitting Space remaining: " + str(fitting_space))
-    print("Power remaining: " + str(power))
-    print("1: Choose a new module")
-    choice = int(input("Selection: "))
-    if choice == 1:
-        print("Possible sizes: ")
-        for i in range(len(slot_types_dict.keys())):
-            print((str(i+1) + ": " + list(slot_types_dict.keys())[i]))
+    global fitting_space
+    global power
+    global modules
+    modules = []
+    fitting_space_cap = fitting_space
+    power_cap = 0
+    while True:
+        print("Fitting space remaining: " + str(fitting_space))
+        print("Power remaining: " + str(power))
+        try:
+            print()     
+            print("1: Choose a new module")
+            print("2: Print the ship")
+            print("3: Quit")
+            choice = int(input("Selection: "))
+            if choice == 1:
+                print("Possible sizes: ")
+                for i in range(len(slot_types_dict.keys())):
+                    print((str(i+1) + ": " + list(slot_types_dict.keys())[i]))
+                
+                choice_size = int(input("Selection: "))
+                print("Possible slots:")
+                for i in range(len(slot_types_dict[list(slot_types_dict.keys())[choice_size-1]])):
+                    print(str(i+1) + ": " + slot_types_dict[list(slot_types_dict.keys())[choice_size-1]][i])
+                choice_slot = int(input("Selection: "))
+
+                print("Possible modules:")
+                for i in range(len(ship_modules_dict[slot_types_dict[list(slot_types_dict.keys())[choice_size-1]][choice_slot-1]])):
+                    print(str(i+1) + ": " + ship_modules_dict[slot_types_dict[list(slot_types_dict.keys())[choice_size-1]][choice_slot-1]][i])
+                choice = int(input("Selection: "))
+                
+                module = ship_modules_dict[slot_types_dict[list(slot_types_dict.keys())[choice_size-1]][choice_slot-1]][choice-1]
+                power += int(module_stats_dict[module][1])
+                fitting_space -= int(module_stats_dict[module][0])
+                if int(module_stats_dict[module][1]) > 0:
+                    power_cap += int(module_stats_dict[module][1])
+                continue
+
+            if choice == 2:
+                unique_modules = []
+                count = []
+                for i in modules:
+                    if i not in unique_modules:
+                        unique_modules.append(i)
+                        count.append(modules.count(i))
+                modules = []
+                for i in range(len(unique_modules)):
+                    modules.append([unique_modules[i], count[i]])
+                
+                output = ""
+                output += "Power Remaining: " + str(power) + " (" + str(power_cap) + ")\n"
+                output += "Fitting Space Remaining: " + str(fitting_space) + " (" + str(fitting_space_cap) + ")\n"
+                output += "List of Modules:\n"
+                for i in modules:
+                    if i[1] > 1:
+                        output += i[0] + " x" + str(i[1]) + "\n"
+                    else:
+                        output += i[0] + "\n"
+                print(output)
+                continue
+            if choice == 3:
+                break
+     
+
+        except ValueError: 
+            print("That is not a valid integer! Try again.")
+        except IndexError: 
+            print("That is out of range! Try again.")
+
 
 load_from_csv()
 while True:
@@ -81,7 +215,7 @@ while True:
         print("Possible categories are:")
         for i in range(1, len(hull_types)+1):
             print(str(i) + ": " +hull_types[i-1])
-        choice = int(input("Enter the number of the category you want, or zero for freeform mode: "))
+        choice = int(input("Enter the number of the category you want, zero for freeform mode, or -1 to quit: "))
         if choice > 0:   
             ship_category = hull_types[int(choice)-1]
             print("Possible hulls in this category are:")
@@ -90,15 +224,18 @@ while True:
             choice = int(input("Enter the number of the hull you want, or 0 to go back: "))
             if choice > 0:
                 ship_hull = ship_type_dict[ship_category][int(choice)-1]
+                power = 0
                 existing_refit()
-                break
+                continue
             else:
                 continue
+        elif choice < 0:
+            break
         else:
-            fitting_space = input("Enter the fitting space of your ship: ")
+            fitting_space = int(input("Enter the fitting space of your ship: "))
             power = 0
             new_refit()
-            break
+            continue
 
     except ValueError: 
         print("That is not a valid integer! Try again.")
