@@ -1,5 +1,5 @@
 # Companion Ship Fitting Calculator to the Ship Generator V3
-# Ver 0.1.0
+# Ver 0.1.1
 
 import csv, os
 from sys import modules
@@ -103,6 +103,7 @@ def existing_refit():
                 module = ship_modules_dict[slot][choice-1]
                 power += int(module_stats_dict[module][1])
                 fitting_space -= int(module_stats_dict[module][0])
+                modules.append(module)
                 
                 if int(module_stats_dict[module][1]) > 0:
                     power_cap += int(module_stats_dict[module][1])
@@ -116,14 +117,14 @@ def existing_refit():
                     if i not in unique_modules:
                         unique_modules.append(i)
                         count.append(modules.count(i))
-                modules = []
+                clean_modules = []
                 for i in range(len(unique_modules)):
-                    modules.append([unique_modules[i], count[i]])
+                    clean_modules.append((unique_modules[i], count[i]))
                 output = ""
                 output += "Power Remaining: " + str(power) + " (" + str(power_cap) + ")\n"
                 output += "Fitting Space Remaining: " + str(fitting_space) + " (" + str(fitting_space_cap) + ")\n"
                 output += "List of Modules:\n"
-                for i in modules:
+                for i in clean_modules:
                     if i[1] > 1:
                         output += i[0] + " x" + str(i[1]) + "\n"
                     else:
@@ -158,23 +159,27 @@ def new_refit():
                 print("Possible sizes: ")
                 for i in range(len(slot_types_dict.keys())):
                     print((str(i+1) + ": " + list(slot_types_dict.keys())[i]))
-                
-                choice_size = int(input("Selection: "))
-                print("Possible slots:")
-                for i in range(len(slot_types_dict[list(slot_types_dict.keys())[choice_size-1]])):
-                    print(str(i+1) + ": " + slot_types_dict[list(slot_types_dict.keys())[choice_size-1]][i])
-                choice_slot = int(input("Selection: "))
 
-                print("Possible modules:")
-                for i in range(len(ship_modules_dict[slot_types_dict[list(slot_types_dict.keys())[choice_size-1]][choice_slot-1]])):
-                    print(str(i+1) + ": " + ship_modules_dict[slot_types_dict[list(slot_types_dict.keys())[choice_size-1]][choice_slot-1]][i])
+                choice = int(input("Selection: "))
+
+                possible_slots = slot_types_dict[list(slot_types_dict.keys())[choice-1]]
+                print("Possible slots:")
+                for i in range(len(possible_slots)):
+                    print(str(i+1) + ": " + possible_slots[i])
                 choice = int(input("Selection: "))
                 
-                module = ship_modules_dict[slot_types_dict[list(slot_types_dict.keys())[choice_size-1]][choice_slot-1]][choice-1]
+                possible_modules = ship_modules_dict[possible_slots[choice-1]]
+                print("Possible modules:")
+                for i in range(len(possible_modules)):
+                    print(str(i+1) + ": " + possible_modules[i])
+                choice = int(input("Selection: "))
+
+                module = possible_modules[choice-1]
                 power += int(module_stats_dict[module][1])
                 fitting_space -= int(module_stats_dict[module][0])
                 if int(module_stats_dict[module][1]) > 0:
                     power_cap += int(module_stats_dict[module][1])
+                modules.append(module)
                 continue
 
             if choice == 2:
