@@ -1,5 +1,5 @@
 # Companion Ship Fitting Calculator to the Ship Generator V3
-# Ver 0.1.1
+# Ver 0.1.2
 
 import csv, os
 from sys import modules
@@ -189,15 +189,14 @@ def new_refit():
                     if i not in unique_modules:
                         unique_modules.append(i)
                         count.append(modules.count(i))
-                modules = []
+                clean_modules = []
                 for i in range(len(unique_modules)):
-                    modules.append([unique_modules[i], count[i]])
-                
+                    clean_modules.append((unique_modules[i], count[i]))
                 output = ""
                 output += "Power Remaining: " + str(power) + " (" + str(power_cap) + ")\n"
                 output += "Fitting Space Remaining: " + str(fitting_space) + " (" + str(fitting_space_cap) + ")\n"
                 output += "List of Modules:\n"
-                for i in modules:
+                for i in clean_modules:
                     if i[1] > 1:
                         output += i[0] + " x" + str(i[1]) + "\n"
                     else:
