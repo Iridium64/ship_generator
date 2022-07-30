@@ -1,7 +1,8 @@
 Swallow: Skylab, Cargo, System Shuttle, Pirate, Yardworker
 Skink: Mobile Observatory, Hauler, Liner, Privateer
 Anvil I: Shipping Line, Tanker, Blockade Runner, Wildcatter, Heavy Tug
-Anvil II: Shipping Line, Tanker
+Anvil II: Shipping Line, Tanker, Heavy Manufacturing
+Anvil III: Shipping Line, Tanker
 Hammer: Trailblazer, Express Delivery, Donkey
 Flint: Barge Carrier, Asteroid Cutter
 Dove: Assault, Patrol
@@ -11,3 +12,4 @@ Beetle: Pirate Defense
 Monkey: Tramp Freight, Pirate
 Bear: Tramp Freight, Privateer
 Shield: Pirate Defense
+Corona: Liner
