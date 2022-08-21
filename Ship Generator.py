@@ -37,7 +37,8 @@ class Spaceship:
                 ship_modules_dict[slot_types[x]].append(file[i][0])
             for row in file:
                     module_stats_dict[row[0]] = row[1:]
-        
+                    module_stats_dict[row[0]].append(slot_types[x])
+
         
         #determine ship type and refit
         print("Possible categories are:")
@@ -133,5 +134,4 @@ class Spaceship:
                 output += i[0] + "\n"
         return output
 
-Spaceship = Spaceship()
-print(Spaceship)
+print(Spaceship())

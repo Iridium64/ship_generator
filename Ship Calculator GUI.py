@@ -3,6 +3,7 @@
 from tkinter import *
 from tkinter import ttk
 from copy import deepcopy
+
 from config.definintions import ROOT_DIR
 import csv, os
 
@@ -64,6 +65,12 @@ class ShipCalculator:
         self.mainframe.rowconfigure(1, weight=1)
         self.mainframe.rowconfigure(2, weight=1)
         
+        self.print_btn = ttk.Button(self.mainframe, text="Print", command=self.print_modules)
+        self.print_btn.grid(column=1, row=2)
+
+        self.output_box = Text(self.mainframe)
+        self.output_box.grid(column=0, row=3, columnspan=3)
+
         self.root.mainloop()
     
     def load_from_csv(self): 
@@ -96,6 +103,7 @@ class ShipCalculator:
                 self.ship_modules_dict[self.slot_types_list[x]].append(file[i][0])
             for row in file:
                     self.module_stats_dict[row[0]] = row[1:]
+                    self.module_stats_dict[row[0]].append(self.slot_types_list[x])
 
         self.slot_types_dict = {}
         self.slot_sizes_list = []
@@ -140,8 +148,10 @@ class ShipCalculator:
         self.fitting_space_total = int(self.fitting_space_entry_variable.get())
         self.parts_listvar.set(self.slot_sizes_list)
         self.ship_selection.set("Ship selection...")
-        self.dialogue_box.destroy() 
+        self.dialogue_box.destroy()
+        self.reset_button_pressed()
         self.update_running_total()
+        self.update_module_list()
 
     def ship_selected(self):
         self.part_selection_level = 0
@@ -150,21 +160,23 @@ class ShipCalculator:
         self.slots_remaining = deepcopy(self.ship_slots_dict[self.ship_selection.get()][1:])
         self.parts_listvar.set([str(str(x[1]) + "x " + x[0]) for x in self.slots_remaining if x[1] > 0])
         self.update_running_total()
+        self.reset_button_pressed()
 
     def part_selection(self):
         if self.class_selection.get() == "Freeform Mode":
-            if self.part_selection_level == 0:
-                self.parts_listvar.set(self.slot_types_dict[self.module_selector_LB.selection_get()])
-                self.module_selector_LB.selection_clear(0, END)
-                self.part_selection_level = 1
-            elif self.part_selection_level == 1:
-                self.parts_listvar.set(self.ship_modules_dict[self.module_selector_LB.selection_get()])
-                self.module_selector_LB.selection_clear(0, END)
-                self.part_selection_level = 2
-            elif self.part_selection_level == 2:
-                self.part_added(self.module_selector_LB.selection_get())
-                self.module_selector_LB.selection_clear(0, END)
-                self.parts_listvar.set(self.slot_sizes_list)  
+            if len(self.module_selector_LB.curselection()):
+                if self.part_selection_level == 0:
+                    self.parts_listvar.set(self.slot_types_dict[self.module_selector_LB.selection_get()])
+                    self.module_selector_LB.selection_clear(0, END)
+                    self.part_selection_level = 1
+                elif self.part_selection_level == 1:
+                    self.parts_listvar.set(self.ship_modules_dict[self.module_selector_LB.selection_get()])
+                    self.module_selector_LB.selection_clear(0, END)
+                    self.part_selection_level = 2
+                elif self.part_selection_level == 2:
+                    self.part_added(self.module_selector_LB.selection_get())
+                    self.module_selector_LB.selection_clear(0, END)
+                    self.parts_listvar.set(self.slot_sizes_list)  
         else:
             if self.part_selection_level == 0:
                 self.slot = ""
@@ -180,8 +192,6 @@ class ShipCalculator:
                 self.part_added(self.module_selector_LB.selection_get())
                 self.parts_listvar.set([str(str(x[1]) + "x " + x[0]) for x in self.slots_remaining if x[1] > 0])
 
-              
-
     def back_button_pressed(self):
         if self.part_selection_level > 0:
             self.module_selector_LB.selection_clear(0, END)
@@ -191,6 +201,8 @@ class ShipCalculator:
                     self.parts_listvar.set([str(str(x[1]) + "x " + x[0]) for x in self.slots_remaining if x[1] > 0])
                 else:
                     self.parts_listvar.set(self.slot_sizes_list)
+            elif self.part_selection_level == 1 and self.class_selection.get() != "Freeform Mode":
+                pass
             self.update_running_total()
             self.part_selection()
 
@@ -236,16 +248,21 @@ class ShipCalculator:
             index = self.fittings_display_LB.curselection()[0]
             removal = self.clean_modules[index][0]
 
-            self.fitting_space_use -=deepcopy(int(self.module_stats_dict[removal][0]))
-            self.power_use += deepcopy(int(self.module_stats_dict[removal][1]))
-            if int(self.module_stats_dict[removal][1]) < 0:
+            self.fitting_space_use -=deepcopy(int(self.module_stats_dict[removal][0]))            
+            if int(self.module_stats_dict[removal][1]) > 0:
                 self.power_total -= deepcopy(int(self.module_stats_dict[removal][1]))
+            else:
+                self.power_use += deepcopy(int(self.module_stats_dict[removal][1]))
             self.modules.remove(removal)
+            for i in self.slots_remaining:
+                if i[0] == self.module_stats_dict[removal][3]:
+                    i[1] += 1
+
             self.update_running_total()
             self.update_module_list()
             self.fittings_display_LB.selection_clear(0, END)
-
-            self.parts_listvar.set([str(str(x[1]) + "x " + x[0]) for x in self.slots_remaining if x[1] > 0])
+            if self.class_selection.get() != "Freeform Mode":
+                self.parts_listvar.set([str(str(x[1]) + "x " + x[0]) for x in self.slots_remaining if x[1] > 0])
 
     def reset_button_pressed(self):
         if self.class_selection.get() != "Freeform Mode":
@@ -259,7 +276,20 @@ class ShipCalculator:
         self.modules = []
         self.update_running_total()
         self.update_module_list()
-        
+        self.print_modules()
+    
+    def print_modules(self):
+        self.output_box.delete("1.0", "end")
+        output = "Power Remaining: " + str(self.power_remaining) + " (" + str(self.power_total) + ")\n"
+        output += "Fitting Space Remaining: " + str(self.fitting_space_remaining) + " (" + str(self.fitting_space_total) + ")\n"
+        output += "List of Modules:\n"
+
+        for i in self.clean_modules:
+            if i[1] > 1:
+                output += i[0] + " x" + str(i[1]) + "\n"
+            else:
+                output += i[0] + "\n"
+        self.output_box.insert("1.0", output)
 
 
 ShipCalculator()
